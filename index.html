@@ -1,48 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Bad Apple - Checkboxland</title>
-  <script src="https://unpkg.com/checkboxland/dist/checkboxland.min.js"></script>
-  <script src="https://unpkg.com/checkboxland/demos/bad-apple/dist/bad-apple.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bad Apple - Auto Play</title>
   <style>
-    body {
-      margin: 0;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    #badapple {
-      font-size: 4px;
-      line-height: 4px;
-      display: grid;
-      grid-template-columns: repeat(80, auto);
-    }
-    #badapple input {
-      width: 4px;
-      height: 4px;
+    html, body {
       margin: 0;
       padding: 0;
-      appearance: none;
-      -webkit-appearance: none;
-      background: white;
-    }
-    #badapple input:checked {
+      height: 100%;
       background: black;
+      overflow: hidden;
+    }
+    video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
     }
   </style>
 </head>
 <body>
-  <div id="badapple"></div>
-
-  <script>
-    const cbl = new Checkboxland({
-      dimensions: '80x60',
-      selector: '#badapple',
-    });
-    cbl.runBadApple();
-  </script>
+  <video autoplay muted playsinline loop>
+    <source src="badapple.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 </body>
 </html>
