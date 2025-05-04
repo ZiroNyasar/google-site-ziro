@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bad Apple - Checkboxland</title>
+  <script src="https://unpkg.com/checkboxland/dist/checkboxland.min.js"></script>
+  <script src="https://unpkg.com/checkboxland/demos/bad-apple/dist/bad-apple.min.js"></script>
+  <style>
+    body { margin: 0; background: black; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #badapple { line-height: 1; }
+  </style>
+</head>
+<body>
+  <div id="badapple"></div>
+
+  <script>
+    const cbl = new Checkboxland({
+      dimensions: '80x60',
+      selector: '#badapple',
+    });
+    cbl.runBadApple();
+  </script>
+</body>
+</html>
