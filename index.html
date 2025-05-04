@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Apel buruk</title>
+  <title>Rahasia</title>
   <style>
     html, body {
       margin: 0;
@@ -19,6 +19,7 @@
       width: 100vw;
       height: 100vh;
       object-fit: fill;
+      pointer-events: none;
     }
     .overlay {
       position: absolute;
@@ -26,17 +27,18 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.85);
       color: white;
       font-size: 2em;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      z-index: 2;
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false">
   <video id="badapple" playsinline loop>
     <source src="badapple.mp4" type="video/mp4">
     Your browser does not support the video tag.
