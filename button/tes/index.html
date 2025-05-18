@@ -1,46 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beranda</title>
   <style>
-    body {
+    * {
       margin: 0;
-      background-color: #000000;
-      height: 100vh;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden; /* Nonaktifkan scroll */
+      background-color: #ffffff;
       display: flex;
       justify-content: center;
       align-items: center;
+      font-family: sans-serif;
     }
 
     .button-container {
       display: flex;
+      gap: 20px;
       flex-wrap: wrap;
-      justify-content: space-between;
-      width: 90%;
-      max-width: 800px;
+      justify-content: center;
     }
 
-    .shadow__btn {
-      padding: 10px 20px;
-      border: 2px solid white;
-      font-size: 17px;
-      color: white;
-      border-radius: 7px;
-      letter-spacing: 4px;
-      font-weight: 700;
-      text-transform: uppercase;
-      background-color: transparent;
-      transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    .button {
       cursor: pointer;
-      margin: 10px;
-      flex: 1 1 30%;
-      text-align: center;
+      position: relative;
+      padding: 12px 28px;
+      font-size: 18px;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      border-radius: 34px;
+      background-color: #000000;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      overflow: hidden;
+      min-width: 120px;
     }
 
-    .shadow__btn:hover {
-      background-color: white;
-      color: black;
-      box-shadow: 0 0 10px white, 0 0 40px white, 0 0 80px white;
+    .button::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 50px;
+      height: 50px;
+      border-radius: inherit;
+      scale: 0;
+      z-index: -1;
+      background-color: #ffffff;
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .button:hover::before {
+      scale: 3;
+    }
+
+    .button:hover {
+      color: #000000;
+      scale: 1.05;
+      box-shadow: 0 0px 20px rgba(255, 255, 255, 0.4);
+    }
+
+    .button:active {
+      transform: scale(1); /* freeze scale */
+      pointer-events: none; /* freeze klik animasi sementara */
     }
 
     @media (max-width: 600px) {
@@ -48,21 +78,14 @@
         flex-direction: column;
         align-items: center;
       }
-      .shadow__btn {
-        flex: none;
-        width: 100%;
-        max-width: 300px;
-      }
     }
   </style>
 </head>
 <body>
-
   <div class="button-container">
-    <button class="shadow__btn">Tentang Saya</button>
-    <button class="shadow__btn">Kontak Saya</button>
-    <button class="shadow__btn">Project</button>
+    <button class="button" onclick="location.href='https://sites.google.com/view/zirosusilo/tentang-saya'">Tentang Saya</button>
+    <button class="button" onclick="location.href='https://sites.google.com/view/zirosusilo/kontak-saya'">Kontak Saya</button>
+    <button class="button" onclick="location.href='https://sites.google.com/view/zirosusilo/project'">Project</button>
   </div>
-
 </body>
 </html>
