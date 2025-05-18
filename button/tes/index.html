@@ -3,10 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Button Demo</title>
+  <title>Halaman Tombol</title>
   <style>
-    body {
+    /* Reset dan tampilan dasar */
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       background-color: #000000;
       overflow: hidden;
       font-family: sans-serif;
@@ -14,6 +20,7 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      color: white;
     }
 
     .button-container {
@@ -21,6 +28,9 @@
       gap: 20px;
       flex-wrap: wrap;
       justify-content: center;
+      padding: 20px;
+      width: 100%;
+      max-width: 800px;
     }
 
     .button {
@@ -37,6 +47,8 @@
       cursor: pointer;
       z-index: 1;
       transition: all 0.3s ease;
+      flex: 1 1 200px;
+      text-align: center;
     }
 
     .button::before {
@@ -71,20 +83,21 @@
     @media (max-width: 600px) {
       .button {
         flex: 1 1 100%;
-        text-align: center;
       }
+
       .button-container {
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
+        padding: 20px;
       }
     }
   </style>
 </head>
 <body>
   <div class="button-container">
-    <a class="button" href="tentang.html">Tentang Saya</a>
-    <a class="button" href="kontak.html">Kontak Saya</a>
-    <a class="button" href="project.html">Project</a>
+    <a class="button" href="https://sites.google.com/view/zirosusilo/tentang-saya" target="_blank" rel="noopener noreferrer">Tentang Saya</a>
+    <a class="button" href="https://sites.google.com/view/zirosusilo/kontak-saya" target="_blank" rel="noopener noreferrer">Kontak Saya</a>
+    <a class="button" href="https://sites.google.com/view/zirosusilo/project" target="_blank" rel="noopener noreferrer">Project</a>
   </div>
 </body>
 </html>
