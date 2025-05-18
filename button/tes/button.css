@@ -1,24 +1,27 @@
+body {
+  background-color: #121212;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
 .shadow__btn {
   padding: 10px 20px;
-  border: none;
+  border: 2px solid white;
   font-size: 17px;
-  color: #fff;
+  color: white;
   border-radius: 7px;
   letter-spacing: 4px;
   font-weight: 700;
   text-transform: uppercase;
-  transition: 0.5s;
-  transition-property: box-shadow;
-}
-
-.shadow__btn {
-  background: rgb(0,140,255);
-  box-shadow: 0 0 25px rgb(0,140,255);
+  background-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .shadow__btn:hover {
-  box-shadow: 0 0 5px rgb(0,140,255),
-              0 0 25px rgb(0,140,255),
-              0 0 50px rgb(0,140,255),
-              0 0 100px rgb(0,140,255);
+  background-color: white;
+  color: black;
+  box-shadow: 0 0 10px white, 0 0 40px white, 0 0 80px white;
 }
