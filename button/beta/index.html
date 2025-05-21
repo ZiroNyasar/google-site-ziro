@@ -1,21 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <title>Tombol Fullscreen</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- ✅ Google Fonts: Montserrat Regular -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <link rel="stylesheet" href="style.css">
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background-color: black;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .button {
+      width: 100vw;
+      height: 100vh;
+      background-color: transparent;
+      color: rgb(193, 163, 98);
+      font-size: clamp(1.2rem, 5vw, 5rem);
+      font-weight: 600;
+      border: 2px solid rgb(193, 163, 98);
+      border-radius: 34px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .button::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 50px;
+      height: 50px;
+      border-radius: inherit;
+      transform: scale(0);
+      z-index: -1;
+      background-color: white;
+      transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .button:hover::before {
+      transform: scale(3);
+    }
+
+    .button:hover {
+      color: #212121;
+      transform: scale(1.02);
+    }
+
+    .button:active {
+      transform: scale(1);
+    }
+  </style>
 </head>
 <body>
-  <a href="https://sites.google.com/view/zirosusilo/home?authuser=0"
-   class="button"
-   target="_top"
-   rel="noopener noreferrer">
-   Klik Saya
-  </a>
+  <button class="button" onclick="goTo('https://sites.google.com/view/zirosusilo/home?authuser=0')">
+    Klik Saya
+  </button>
+
+  <script>
+    function goTo(url) {
+      window.open(url, '_blank');
+    }
+  </script>
 </body>
 </html>
