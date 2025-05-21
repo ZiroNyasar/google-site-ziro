@@ -24,17 +24,19 @@
       height: 100vh;
       background-color: transparent;
       color: white;
+      font-family: 'Montserrat', sans-serif; /* ✅ Gunakan font Montserrat */
       font-size: clamp(1.2rem, 5vw, 3rem);
       font-weight: 400;
+      text-decoration: none; /* Hilangkan underline dari <a> */
       border: 2px solid white;
       border-radius: 1000px;
       cursor: pointer;
       overflow: hidden;
+      z-index: 1;
+      transition: color 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1;
-      transition: color 0.3s ease;
     }
 
     .button::before {
@@ -47,16 +49,16 @@
       background-color: white;
       border-radius: inherit;
       transform: translate(-50%, -50%) scale(0);
-      transition: transform 0.4s ease;
+      transition: transform 0.5s ease;
       z-index: -1;
     }
 
-    .button.active::before {
-      transform: translate(-50%, -50%) scale(100);
+    .button:hover::before {
+      transform: translate(-50%, -50%) scale(100);          /* Membesar menutupi tombol */
     }
 
-    .button.active {
-      color: black;
+    .button:hover {
+      color: black;                  /* Teks jadi hitam saat hover */
     }
 
     .button:active {
@@ -65,31 +67,11 @@
   </style>
 </head>
 <body>
-  <button class="button" id="myButton" onclick="goTo('https://sites.google.com/view/zirosusilo/home?authuser=0')">
+  <button class="button" onclick="goTo('https://sites.google.com/view/zirosusilo/home?authuser=0')">
     Klik Saya
   </button>
 
   <script>
-    const button = document.getElementById('myButton');
-
-    // Aktifkan animasi saat disentuh atau mouse masuk
-    button.addEventListener('pointerenter', () => {
-      button.classList.add('active');
-    });
-
-    // Matikan animasi saat disentuh selesai atau mouse keluar
-    button.addEventListener('pointerleave', () => {
-      button.classList.remove('active');
-    });
-
-    // Untuk layar sentuh — reset saat tap selesai
-    button.addEventListener('pointercancel', () => {
-      button.classList.remove('active');
-    });
-    button.addEventListener('pointerup', () => {
-      button.classList.remove('active');
-    });
-
     function goTo(url) {
       window.open(url, '_blank');
     }
