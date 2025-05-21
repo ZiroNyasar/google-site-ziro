@@ -6,7 +6,8 @@ html, body {
 }
 
 .button {
-  all: unset;
+  cursor: pointer;
+  position: relative;
   width: 100vw;
   height: 100vh;
 
@@ -16,16 +17,14 @@ html, body {
 
   font-size: clamp(1.5rem, 6vw, 5rem);
   color: white;
-  font-weight: 700;
+  font-weight: 600;
 
   border: 2px solid white;
-  background-color: black;
-  border-radius: 1000px; /* membuat tombol tetap bulat meskipun fullscreen */
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
+  border-radius: 1000px;
+  background-color: transparent;
 
-  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .button::before {
@@ -33,24 +32,24 @@ html, body {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 100px;
-  height: 100px;
-  background-color: white;
+  width: 50px;
+  height: 50px;
   border-radius: inherit;
   scale: 0;
   z-index: -1;
-  transition: scale 0.6s ease-in-out;
+  background-color: white;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .button:hover::before {
-  scale: 20; /* besar agar nutup seluruh tombol */
+  scale: 10;
 }
 
 .button:hover {
   color: black;
-  transform: scale(1.02); /* sedikit membesar tanpa shadow */
+  /* No box-shadow: efek cahaya dihapus */
 }
 
 .button:active {
-  transform: scale(0.98);
+  scale: 0.98;
 }
