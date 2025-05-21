@@ -6,25 +6,26 @@ html, body {
 }
 
 .button {
-  all: unset; /* Reset bawaan button */
+  all: unset;
+  width: 100vw;
+  height: 100vh;
+
   display: flex;
   justify-content: center;
   align-items: center;
 
-  width: 100vw;
-  height: 100vh;
-
   font-size: clamp(1.5rem, 6vw, 5rem);
   color: white;
   font-weight: 700;
+
+  border: 2px solid white;
   background-color: black;
+  border-radius: 1000px; /* membuat tombol tetap bulat meskipun fullscreen */
   position: relative;
   overflow: hidden;
   cursor: pointer;
 
-  border: 2px solid white;
-  border-radius: 0;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .button::before {
@@ -34,22 +35,22 @@ html, body {
   margin: auto;
   width: 100px;
   height: 100px;
-  border-radius: 50%;
+  background-color: white;
+  border-radius: inherit;
   scale: 0;
   z-index: -1;
-  background-color: white;
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: scale 0.6s ease-in-out;
 }
 
 .button:hover::before {
-  scale: 15;
+  scale: 20; /* besar agar nutup seluruh tombol */
 }
 
 .button:hover {
   color: black;
-  /* box-shadow dihapus supaya tidak ada cahaya */
+  transform: scale(1.02); /* sedikit membesar tanpa shadow */
 }
 
 .button:active {
-  scale: 0.98;
+  transform: scale(0.98);
 }
