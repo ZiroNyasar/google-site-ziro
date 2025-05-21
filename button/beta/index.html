@@ -24,10 +24,10 @@
       height: 100vh;
       background-color: transparent;
       color: white;
-      font-family: 'Montserrat', sans-serif; /* ✅ Gunakan font Montserrat */
+      font-family: 'Montserrat', sans-serif;
       font-size: clamp(1.2rem, 5vw, 3rem);
       font-weight: 400;
-      text-decoration: none; /* Hilangkan underline dari <a> */
+      text-decoration: none;
       border: 2px solid white;
       border-radius: 1000px;
       cursor: pointer;
@@ -53,12 +53,15 @@
       z-index: -1;
     }
 
-    .button:hover::before {
-      transform: translate(-50%, -50%) scale(100);          /* Membesar menutupi tombol */
-    }
+    /* Hover effect hanya untuk perangkat dengan pointer 'fine' (mouse) */
+    @media (hover: hover) and (pointer: fine) {
+      .button:hover::before {
+        transform: translate(-50%, -50%) scale(100);
+      }
 
-    .button:hover {
-      color: black;                  /* Teks jadi hitam saat hover */
+      .button:hover {
+        color: black;
+      }
     }
 
     .button:active {
