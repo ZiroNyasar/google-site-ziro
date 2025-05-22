@@ -33,7 +33,7 @@
       cursor: pointer;
       overflow: hidden;
       z-index: 1;
-      transition: color 0.3s ease;
+      transition: color 0.3s ease, transform 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -60,6 +60,14 @@
     .button:hover {
       color: black;                  /* Teks jadi hitam saat hover */
     }
+
+    .button.touched::before {
+      transform: translate(-50%, -50%) scale(100);
+    }
+
+    .button.touched {
+      color: black;
+    }
   </style>
 </head>
 <body>
@@ -70,17 +78,20 @@
   <script>
     const button = document.querySelector('.button');
   
+    // Untuk mobile: meniru efek hover
     button.addEventListener('touchstart', () => {
+      button.classList.add('touched');
       button.style.transform = 'scale(0.98)';
     });
   
     button.addEventListener('touchend', () => {
+      button.classList.remove('touched');
       button.style.transform = 'scale(1)';
     });
   
     function goTo(url) {
       window.open(url, '_blank');
     }
-  </script>  
+  </script>   
 </body>
 </html>
