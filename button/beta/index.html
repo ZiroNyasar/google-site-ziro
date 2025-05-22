@@ -60,10 +60,6 @@
     .button:hover {
       color: black;                  /* Teks jadi hitam saat hover */
     }
-
-    .button:active {
-      transform: scale(0.98);
-    }
   </style>
 </head>
 <body>
@@ -72,9 +68,19 @@
   </button>
 
   <script>
+    const button = document.querySelector('.button');
+  
+    button.addEventListener('touchstart', () => {
+      button.style.transform = 'scale(0.98)';
+    });
+  
+    button.addEventListener('touchend', () => {
+      button.style.transform = 'scale(1)';
+    });
+  
     function goTo(url) {
       window.open(url, '_blank');
     }
-  </script>
+  </script>  
 </body>
 </html>
