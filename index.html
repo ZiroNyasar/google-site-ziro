@@ -1,191 +1,143 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rahasia</title>
   <style>
-    html,body { margin:0; padding:0; height:100%; background:#000; overflow:hidden; font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial; color:#fff }
-    /* video mengisi seluruh layar tanpa meninggalkan sisi kosong */
+    html, body {
+      margin:0;
+      padding:0;
+      height:100%;
+      background:#000;
+      overflow:hidden;
+    }
+    /* STRETCH agar selalu pas di semua device (width 100vw & height 100vh, object-fit: fill) */
     video {
       position:fixed;
-      inset:0;
-      min-width:100%;
-      min-height:100%;
-      width:auto;
-      height:auto;
-      object-fit:cover; /* cover = stretch/crop sesuai device */
-      background:black;
+      top:0;
+      left:0;
+      width:100vw;
+      height:100vh;
+      object-fit:fill; /* stretch sesuai permintaan Anda */
       pointer-events:none;
+      background:black;
     }
     .overlay {
       position:fixed;
-      inset:0;
+      top:0;
+      left:0;
+      width:100vw;
+      height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      z-index:3;
+      z-index:2;
+      cursor:pointer;
+      color:#fff;
+      font-family:system-ui,Segoe UI,Roboto,Arial;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
-      background:rgba(0,0,0,0.32);
+      background:rgba(0,0,0,0.35);
     }
-    .card {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      padding:12px 14px;
-      border-radius:10px;
-      background:rgba(255,255,255,0.06);
-      backdrop-filter: blur(6px);
-      box-shadow:0 6px 18px rgba(0,0,0,0.6);
+    .btn {
+      padding:12px 20px;
+      border-radius:8px;
+      background:rgba(255,255,255,0.08);
+      backdrop-filter:blur(4px);
+      font-weight:600;
     }
-    .spinner { width:18px; height:18px; border-radius:50%; border:3px solid rgba(255,255,255,0.12); border-top-color:rgba(255,255,255,0.95); animation:spin .9s linear infinite }
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .text { font-size:15px; line-height:1 }
-    .btn { margin-left:8px; padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.12); font-weight:600; cursor:pointer; }
-    .hidden { display:none }
-    .controls { display:flex; gap:8px; align-items:center; margin-left:10px }
+    .loading {
+      position:absolute;
+      top:16px;
+      left:16px;
+      color:#ddd;
+      font-size:14px;
+      z-index:3;
+    }
+    .hidden { display:none; }
   </style>
 </head>
 <body>
-  <!-- pasang poster.jpg jika ada -->
-  <video id="badapple" playsinline loop preload="auto" poster="poster.jpg" crossorigin="anonymous" muted>
-    <source src="badapple.mp4" type="video/mp4" />
-    Browser Anda tidak mendukung video.
+  <div class="loading" id="loading">Memuat video...</div>
+
+  <video id="badapple" playsinline loop preload="auto" poster="poster.jpg" crossorigin="anonymous">
+    <source src="badapple.mp4" type="video/mp4">
+    Browser tidak mendukung video.
   </video>
 
-  <div class="overlay" id="overlay" role="button" aria-live="polite" tabindex="0">
-    <div class="card" id="card">
-      <div class="spinner" id="spinner" aria-hidden="true"></div>
-      <div>
-        <div class="text" id="status">Memuat video...</div>
-        <div style="font-size:12px; opacity:.85">Klik untuk mulai</div>
-      </div>
-
-      <div class="controls">
-        <div class="btn hidden" id="playBtn">Putar</div>
-        <div class="btn hidden" id="soundBtn" aria-pressed="false">Suara</div>
-      </div>
-    </div>
+  <div class="overlay" id="overlay" role="button" aria-label="Putar video">
+    <div class="btn" id="label">Putar video</div>
   </div>
 
   <script>
     const video = document.getElementById('badapple');
     const overlay = document.getElementById('overlay');
-    const spinner = document.getElementById('spinner');
-    const status = document.getElementById('status');
-    const playBtn = document.getElementById('playBtn');
-    const soundBtn = document.getElementById('soundBtn');
+    const label = document.getElementById('label');
+    const loading = document.getElementById('loading');
 
     let ready = false;
     let fallback = false;
-    let wantSound = false;
 
-    // Pastikan video selalu cover (untuk beberapa browser)
-    video.style.objectFit = 'cover';
-
-    function showReady() {
-      if (ready) return;
+    // Tunggu video siap (cukup buffer) sebelum menandai siap.
+    video.addEventListener('canplaythrough', () => {
       ready = true;
-      spinner.classList.add('hidden');
-      playBtn.classList.remove('hidden');
-      soundBtn.classList.remove('hidden');
-      status.textContent = 'Siap diputar';
-    }
-
-    video.addEventListener('loadedmetadata', () => {
-      status.textContent = 'Memuat metadata...';
+      loading.textContent = 'Siap. Klik untuk putar dengan suara.';
     });
 
-    video.addEventListener('canplaythrough', () => {
-      showReady();
+    // Jika metadata sudah ada, juga update status (lebih cepat di beberapa server).
+    video.addEventListener('loadedmetadata', () => {
+      if (!ready) loading.textContent = 'Memuat metadata...';
     });
 
     video.addEventListener('error', () => {
-      spinner.classList.add('hidden');
-      playBtn.classList.remove('hidden');
-      status.textContent = 'Gagal memuat video';
       fallback = true;
+      loading.textContent = 'Gagal memuat video. Klik overlay untuk unduh.';
+      label.textContent = 'Unduh video';
     });
 
-    // Tombol suara toggle
-    soundBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      // Jika belum diputar, hanya set intent. Jika sudah diputar, toggle langsung.
-      if (video.paused) {
-        wantSound = !wantSound;
-        soundBtn.textContent = wantSound ? 'Suara: ON' : 'Suara: OFF';
-        soundBtn.setAttribute('aria-pressed', wantSound ? 'true' : 'false');
-        return;
-      }
-      // Toggle actual mute
-      if (video.muted) {
-        video.muted = false;
-        if (video.volume === 0) video.volume = 0.9;
-        soundBtn.textContent = 'Suara: ON';
-        soundBtn.setAttribute('aria-pressed', 'true');
-      } else {
-        video.muted = true;
-        soundBtn.textContent = 'Suara: OFF';
-        soundBtn.setAttribute('aria-pressed', 'false');
-      }
-    });
-
-    // Fungsi play yang aman terhadap autoplay policy
-    async function safePlay() {
-      try {
-        // jika user ingin suara, coba unmute dulu. Autoplay with sound sering diblokir.
-        if (wantSound) {
-          video.muted = false;
-          video.volume = 0.9;
-        } else {
-          // awalnya muted supaya autoplay lebih mungkin berhasil pada beberapa browser
-          video.muted = true;
-        }
-        await video.play();
-        // Jika berhasil dan user ingin suara, toggle unmute. Jika autoplay otomatis muted, user masih bisa toggle.
-        if (!wantSound) {
-          // biarkan tetap muted. user bisa aktifkan lewat tombol Sound.
-          soundBtn.textContent = 'Suara: OFF';
-          soundBtn.setAttribute('aria-pressed', 'false');
-        } else {
-          video.muted = false;
-          soundBtn.textContent = 'Suara: ON';
-          soundBtn.setAttribute('aria-pressed', 'true');
-        }
-        overlay.style.display = 'none';
-      } catch (err) {
-        // Jika play diblokir, sampaikan ke user
-        spinner.classList.add('hidden');
-        status.textContent = 'Pemutaran diblokir oleh browser';
-        playBtn.textContent = 'Coba unduh';
-        fallback = true;
-      }
-    }
-
-    // Klik overlay sama fungsi dengan klik play
+    // Saat user klik: paksa suara aktif lalu play.
     overlay.addEventListener('click', async (e) => {
+      e.preventDefault();
       e.stopPropagation();
+
+      // fallback: arahkan ke file jika gagal load
       if (fallback) {
-        // arahkan langsung ke file jika gagal
         window.location.href = 'badapple.mp4';
         return;
       }
+
+      // Jika belum siap, beri umpan balik singkat dan coba tetap play
       if (!ready) {
-        status.textContent = 'Masih memuat, tunggu sebentar';
-        spinner.classList.remove('hidden');
-        return;
+        loading.textContent = 'Masih memuat. Mencoba putar...';
       }
-      await safePlay();
-    });
 
-    // Tombol play juga memicu
-    playBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      overlay.click();
-    });
+      // Pastikan kita mencoba menjalankan dengan suara aktif.
+      try {
+        video.muted = false;          // set unmuted sebelum play
+        video.volume = 1.0;          // volume penuh (ubah bila perlu)
+        await video.play();          // user-initiated play -> biasanya diizinkan
+        overlay.style.display = 'none';
+        loading.classList.add('hidden');
+      } catch (err) {
+        // Jika browser menolak (jarang saat ada klik user), coba fallback:
+        try {
+          // coba play muted (agar minimal video muncul), lalu beri instruksi unmute manual.
+          video.muted = true;
+          await video.play();
+          loading.textContent = 'Pemutaran diblokir untuk suara. Ketuk ikon volume browser untuk aktifkan suara.';
+          label.textContent = 'Buka suara';
+          // biarkan overlay tampil agar user bisa klik lagi untuk arahkan unduh.
+        } catch (err2) {
+          // Jika tetap gagal, tawarkan unduh
+          loading.textContent = 'Tidak dapat memutar video. Mengunduh...';
+          window.location.href = 'badapple.mp4';
+        }
+      }
+    }, { passive:false });
 
-    // keyboard accessibility
+    // Keyboard accesibility (Enter / Space)
+    overlay.tabIndex = 0;
     overlay.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter' || ev.key === ' ') {
         ev.preventDefault();
@@ -193,25 +145,14 @@
       }
     });
 
-    // Timeout fallback untuk koneksi sangat lambat
+    // Timeout fallback kalau sangat lambat
     setTimeout(() => {
       if (!ready && !fallback) {
-        spinner.classList.add('hidden');
-        playBtn.classList.remove('hidden');
-        status.textContent = 'Memuat lama. Klik untuk unduh';
+        loading.textContent = 'Memuat lama. Klik untuk coba unduh.';
+        label.textContent = 'Unduh video';
         fallback = true;
       }
     }, 12000);
-
-    // Jika user menekan soundBtn sebelum play, beri tanda intent.
-    // (handled di atas)
-
-    // Jika video selesai inisialisasi tapi belum canplaythrough, tetap tunjukkan play agar user tidak bingung.
-    video.addEventListener('loadeddata', () => {
-      if (!ready) {
-        showReady();
-      }
-    });
   </script>
 </body>
 </html>
