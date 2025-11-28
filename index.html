@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cinema View</title>
+  <title>Cinema Stretch</title>
   <style>
     :root {
       --glass-bg: rgba(255, 255, 255, 0.05);
@@ -16,19 +16,21 @@
       padding: 0;
       height: 100%;
       background: #000;
-      overflow: hidden;
+      overflow: hidden; /* Mencegah scrollbar muncul */
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: var(--text-color);
     }
 
-    /* Video memenuhi layar dengan proporsi terjaga (cover) atau paksa (fill) */
+    /* UBAHAN UTAMA: 
+       object-fit: fill -> Memaksa video ditarik/gepeng menyesuaikan ukuran box
+    */
     video {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover; /* Gunakan 'cover' agar tidak gepeng, atau 'fill' untuk memaksa */
+      width: 100vw;  /* Lebar 100% viewport */
+      height: 100vh; /* Tinggi 100% viewport */
+      object-fit: fill; /* KUNCI: Stretch paksa tanpa peduli rasio */
       z-index: 1;
     }
 
@@ -67,6 +69,7 @@
       font-size: 14px;
       margin-bottom: 24px;
       opacity: 0.8;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
     /* Tombol Modern Minimalis */
@@ -109,6 +112,7 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
+      display: inline-block;
     }
 
     .hidden { display: none; }
@@ -146,50 +150,39 @@
     // Paksa volume maksimal
     video.volume = 1.0;
 
-    // Fungsi untuk memulai video dan menghilangkan overlay
     function playVideo() {
-      video.muted = false; // Pastikan suara nyala
+      video.muted = false;
       video.play().then(() => {
-        // Efek fade out UI
         overlay.classList.add('fade-out');
-        console.log('Video diputar dengan suara.');
       }).catch((error) => {
         console.error("Gagal memutar:", error);
-        // Jika masih gagal (jarang terjadi setelah klik), tampilkan pesan
         statusText.textContent = "TAP LAYAR";
       });
     }
 
-    // Coba Autoplay Paksa saat data siap
     video.addEventListener('canplaythrough', async () => {
-      loader.classList.add('hidden'); // Sembunyikan loader
+      loader.classList.add('hidden');
       
       try {
-        // Usaha 1: Coba langsung putar dengan suara
+        // Coba autoplay langsung dengan suara
         video.muted = false;
         await video.play();
-        // Jika berhasil (browser mengizinkan), hilangkan overlay
         overlay.classList.add('fade-out');
       } catch (err) {
-        // Jika Browser Memblokir (Skenario Paling Umum):
-        // Tampilkan tombol minimalis untuk meminta interaksi user
-        console.log("Autoplay audio diblokir browser. Menunggu interaksi user.");
+        // Jika diblokir browser, tampilkan tombol
         statusText.textContent = "KETUK UNTUK MEMUTAR";
         startBtn.classList.remove('hidden');
       }
     });
 
-    // Event Listener Tombol
     startBtn.addEventListener('click', playVideo);
 
-    // Event Listener Klik Overlay (UX lebih baik, klik di mana saja bisa play)
     overlay.addEventListener('click', (e) => {
       if (!startBtn.classList.contains('hidden')) {
         playVideo();
       }
     });
 
-    // Fallback jika video loading terlalu lama / error
     video.addEventListener('error', () => {
       loader.classList.add('hidden');
       statusText.textContent = "GAGAL MEMUAT VIDEO";
@@ -197,7 +190,6 @@
       startBtn.classList.remove('hidden');
       startBtn.onclick = () => window.location.href = 'badapple.mp4';
     });
-
   </script>
 </body>
 </html>
