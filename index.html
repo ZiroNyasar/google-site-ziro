@@ -3,250 +3,201 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rahasia</title>
+  <title>Cinema View</title>
   <style>
-    html,body {
-      margin:0;
-      padding:0;
-      height:100%;
-      background:#000;
-      overflow:hidden;
-      font-family:system-ui,Segoe UI,Roboto,Arial;
-      color:#fff;
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text-color: #ffffff;
     }
 
-    /* Video stretch seperti permintaan (fill) */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-color);
+    }
+
+    /* Video memenuhi layar dengan proporsi terjaga (cover) atau paksa (fill) */
     video {
-      position:fixed;
-      top:0;
-      left:0;
-      width:100vw;
-      height:100vh;
-      object-fit:fill;
-      background:black;
-      pointer-events:none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* Gunakan 'cover' agar tidak gepeng, atau 'fill' untuk memaksa */
+      z-index: 1;
     }
 
-    /* Overlay kontroller */
+    /* Overlay container */
     .overlay {
-      position:fixed;
-      top:0;
-      left:0;
-      width:100vw;
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:4;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      background:rgba(0,0,0,0.28);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.8s ease;
     }
 
-    .panel {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      padding:12px 16px;
-      border-radius:10px;
-      background:rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px);
-      box-shadow:0 8px 24px rgba(0,0,0,0.6);
+    .overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .spinner {
-      width:18px;
-      height:18px;
-      border-radius:50%;
-      border:3px solid rgba(255,255,255,0.12);
-      border-top-color:rgba(255,255,255,0.95);
-      animation:spin .9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .status {
-      font-size:14px;
-      line-height:1;
-      min-width:160px;
-      text-align:left;
+    /* Container konten tengah */
+    .content-box {
+      text-align: center;
+      animation: fadeIn 1s ease-out;
     }
 
-    .btn {
-      padding:10px 14px;
-      border-radius:8px;
-      background:rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.06);
-      font-weight:600;
-      cursor:pointer;
-      user-select:none;
+    h1 {
+      font-weight: 300;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      font-size: 14px;
+      margin-bottom: 24px;
+      opacity: 0.8;
     }
 
-    .btn[aria-disabled="true"] {
-      opacity:0.45;
-      cursor:not-allowed;
-      pointer-events:none;
+    /* Tombol Modern Minimalis */
+    .play-btn {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: white;
+      padding: 16px 48px;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      border-radius: 50px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .hidden { display:none; }
+    .play-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .play-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Loading Spinner Minimalis */
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-left-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    .hidden { display: none; }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
   </style>
 </head>
 <body>
-  <video id="badapple" playsinline loop preload="auto" crossorigin="anonymous">
+
+  <video id="badapple" playsinline loop preload="auto">
     <source src="badapple.mp4" type="video/mp4">
   </video>
 
-  <div class="overlay" id="overlay" aria-hidden="false">
-    <div class="panel" role="group" aria-label="Kontrol video">
-      <div class="spinner" id="spinner" aria-hidden="true"></div>
-      <div class="status" id="statusText">Memuat video... Mohon tunggu</div>
-      <button class="btn" id="playBtn" aria-pressed="false" aria-disabled="true">Putar</button>
-      <button class="btn" id="muteBtn" aria-pressed="true">Suara: ON</button>
+  <div class="overlay" id="overlay">
+    <div class="content-box">
+      <div class="loader" id="loader"></div>
+      
+      <h1 id="statusText">MEMUAT KONTEKS...</h1>
+
+      <button class="play-btn hidden" id="startBtn">
+        <span>MULAI</span>
+      </button>
     </div>
   </div>
 
   <script>
     const video = document.getElementById('badapple');
     const overlay = document.getElementById('overlay');
-    const spinner = document.getElementById('spinner');
+    const startBtn = document.getElementById('startBtn');
+    const loader = document.getElementById('loader');
     const statusText = document.getElementById('statusText');
-    const playBtn = document.getElementById('playBtn');
-    const muteBtn = document.getElementById('muteBtn');
 
-    let ready = false;
-    let fallback = false;
-
-    console.log('Inisialisasi player');
-
-    // Saat metadata tersedia
-    video.addEventListener('loadedmetadata', () => {
-      console.log('Metadata dimuat');
-      statusText.textContent = 'Memuat video...';
-    });
-
-    // Saat cukup buffered untuk main tanpa jeda
-    video.addEventListener('canplaythrough', () => {
-      ready = true;
-      console.log('Video siap diputar (canplaythrough).');
-      spinner.classList.add('hidden');
-      statusText.textContent = 'Siap diputar';
-      playBtn.setAttribute('aria-disabled','false');
-      playBtn.removeAttribute('disabled');
-    });
-
-    // Fallback jika sudah mulai bisa tampil (loadeddata)
-    video.addEventListener('loadeddata', () => {
-      if (!ready) {
-        console.log('Data video awal dimuat (loadeddata). Menandai siap parsial.');
-        // Tetap jangan aktifkan play sampai canplaythrough,
-        // tapi ubah status supaya user tahu ada progres.
-        statusText.textContent = 'Memuat sebagian...';
-      }
-    });
-
-    video.addEventListener('error', (e) => {
-      fallback = true;
-      console.log('Gagal memuat video. Error event.', e);
-      spinner.classList.add('hidden');
-      statusText.textContent = 'Gagal memuat. Klik Putar untuk unduh.';
-      playBtn.textContent = 'Unduh';
-      playBtn.setAttribute('aria-disabled','false');
-    });
-
-    // Tombol mute toggle (default suara ON sesuai permintaan)
-    video.muted = false;
+    // Paksa volume maksimal
     video.volume = 1.0;
-    muteBtn.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      video.muted = !video.muted;
-      muteBtn.setAttribute('aria-pressed', String(!video.muted));
-      muteBtn.textContent = video.muted ? 'Suara: OFF' : 'Suara: ON';
-      console.log('Toggle suara. muted =', video.muted);
-    });
 
-    // Fungsi pemutaran aman, hanya dipanggil saat interaksi user
-    async function tryPlayWithSound() {
-      if (fallback) {
-        console.log('Mode fallback: mengunduh file.');
-        window.location.href = 'badapple.mp4';
-        return;
-      }
-
-      if (!ready) {
-        console.log('User klik play tapi video belum siap. Menunggu sebentar.');
-        // beri sedikit jeda untuk mencoba lagi
-        statusText.textContent = 'Masih memuat. Mencoba putar...';
-      }
-
-      try {
-        // Pastikan suara aktif sebelum play karena ini dipicu oleh klik user
-        video.muted = false;
-        video.volume = 1.0;
-        await video.play();
-        console.log('Video diputar dengan suara aktif.');
-        overlay.style.display = 'none';
-      } catch (err) {
-        console.log('Play dengan suara gagal:', err);
-        // Coba play muted sebagai fallback minimal
-        try {
-          video.muted = true;
-          await video.play();
-          console.log('Video diputar tanpa suara karena kebijakan browser.');
-          statusText.textContent = 'Video diputar tanpa suara. Aktifkan suara jika perlu.';
-          muteBtn.textContent = 'Suara: OFF';
-          muteBtn.setAttribute('aria-pressed','false');
-          // Jangan sembunyikan overlay agar user bisa melihat status
-        } catch (err2) {
-          console.log('Gagal memutar sama sekali. Mengunduh file.', err2);
-          window.location.href = 'badapple.mp4';
-        }
-      }
+    // Fungsi untuk memulai video dan menghilangkan overlay
+    function playVideo() {
+      video.muted = false; // Pastikan suara nyala
+      video.play().then(() => {
+        // Efek fade out UI
+        overlay.classList.add('fade-out');
+        console.log('Video diputar dengan suara.');
+      }).catch((error) => {
+        console.error("Gagal memutar:", error);
+        // Jika masih gagal (jarang terjadi setelah klik), tampilkan pesan
+        statusText.textContent = "TAP LAYAR";
+      });
     }
 
-    // Klik tombol play
-    playBtn.addEventListener('click', async (ev) => {
-      ev.stopPropagation();
-      if (playBtn.getAttribute('aria-disabled') === 'true') {
-        console.log('Tombol play diklik tapi masih disabled.');
-        return;
-      }
-      // Jika tombol Show "Unduh", fallback akan diarahkan di tryPlayWithSound.
-      await tryPlayWithSound();
-    });
-
-    // Klik area overlay juga memicu play untuk kemudahan
-    overlay.addEventListener('click', async (ev) => {
-      // Jika klik terjadi pada panel elemen internal, biarkan event tombol yang menangani.
-      const target = ev.target;
-      if (target === playBtn || target === muteBtn) return;
-      // Jika play belum aktif, lakukan aksi sama seperti tombol play
-      if (playBtn.getAttribute('aria-disabled') === 'false') {
-        await tryPlayWithSound();
-      } else {
-        console.log('Overlay diklik tetapi tombol play masih nonaktif.');
-      }
-    }, { passive:false });
-
-    // Keyboard accessibility
-    playBtn.tabIndex = 0;
-    muteBtn.tabIndex = 0;
-    playBtn.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter' || ev.key === ' ') {
-        ev.preventDefault();
-        playBtn.click();
+    // Coba Autoplay Paksa saat data siap
+    video.addEventListener('canplaythrough', async () => {
+      loader.classList.add('hidden'); // Sembunyikan loader
+      
+      try {
+        // Usaha 1: Coba langsung putar dengan suara
+        video.muted = false;
+        await video.play();
+        // Jika berhasil (browser mengizinkan), hilangkan overlay
+        overlay.classList.add('fade-out');
+      } catch (err) {
+        // Jika Browser Memblokir (Skenario Paling Umum):
+        // Tampilkan tombol minimalis untuk meminta interaksi user
+        console.log("Autoplay audio diblokir browser. Menunggu interaksi user.");
+        statusText.textContent = "KETUK UNTUK MEMUTAR";
+        startBtn.classList.remove('hidden');
       }
     });
 
-    // Timeout fallback agar user tidak menunggu selamanya
-    setTimeout(() => {
-      if (!ready && !fallback) {
-        fallback = true;
-        console.log('Timeout: memuat terlalu lama. Mengaktifkan fallback.');
-        spinner.classList.add('hidden');
-        statusText.textContent = 'Memuat lama. Klik Putar untuk unduh.';
-        playBtn.textContent = 'Unduh';
-        playBtn.setAttribute('aria-disabled','false');
+    // Event Listener Tombol
+    startBtn.addEventListener('click', playVideo);
+
+    // Event Listener Klik Overlay (UX lebih baik, klik di mana saja bisa play)
+    overlay.addEventListener('click', (e) => {
+      if (!startBtn.classList.contains('hidden')) {
+        playVideo();
       }
-    }, 15000); // 15 detik
+    });
+
+    // Fallback jika video loading terlalu lama / error
+    video.addEventListener('error', () => {
+      loader.classList.add('hidden');
+      statusText.textContent = "GAGAL MEMUAT VIDEO";
+      startBtn.textContent = "UNDUH FILE";
+      startBtn.classList.remove('hidden');
+      startBtn.onclick = () => window.location.href = 'badapple.mp4';
+    });
+
   </script>
 </body>
 </html>
