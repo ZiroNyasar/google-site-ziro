@@ -12,14 +12,13 @@
       background:#000;
       overflow:hidden;
     }
-    /* STRETCH agar selalu pas di semua device (width 100vw & height 100vh, object-fit: fill) */
     video {
       position:fixed;
       top:0;
       left:0;
       width:100vw;
       height:100vh;
-      object-fit:fill; /* stretch sesuai permintaan Anda */
+      object-fit:fill; /* stretch sesuai permintaan */
       pointer-events:none;
       background:black;
     }
@@ -34,122 +33,86 @@
       justify-content:center;
       z-index:2;
       cursor:pointer;
-      color:#fff;
-      font-family:system-ui,Segoe UI,Roboto,Arial;
+      background:rgba(0,0,0,0.35);
       user-select:none;
       -webkit-tap-highlight-color: transparent;
-      background:rgba(0,0,0,0.35);
     }
-    .btn {
-      padding:12px 20px;
-      border-radius:8px;
-      background:rgba(255,255,255,0.08);
-      backdrop-filter:blur(4px);
-      font-weight:600;
-    }
-    .loading {
-      position:absolute;
-      top:16px;
-      left:16px;
-      color:#ddd;
-      font-size:14px;
-      z-index:3;
-    }
-    .hidden { display:none; }
   </style>
 </head>
 <body>
-  <div class="loading" id="loading">Memuat video...</div>
-
-  <video id="badapple" playsinline loop preload="auto" poster="poster.jpg" crossorigin="anonymous">
+  <video id="badapple" playsinline loop preload="auto" crossorigin="anonymous">
     <source src="badapple.mp4" type="video/mp4">
-    Browser tidak mendukung video.
   </video>
 
-  <div class="overlay" id="overlay" role="button" aria-label="Putar video">
-    <div class="btn" id="label">Putar video</div>
-  </div>
+  <div class="overlay" id="overlay"></div>
 
   <script>
-    const video = document.getElementById('badapple');
-    const overlay = document.getElementById('overlay');
-    const label = document.getElementById('label');
-    const loading = document.getElementById('loading');
+    const video = document.getElementById("badapple");
+    const overlay = document.getElementById("overlay");
 
     let ready = false;
     let fallback = false;
 
-    // Tunggu video siap (cukup buffer) sebelum menandai siap.
-    video.addEventListener('canplaythrough', () => {
+    video.addEventListener("loadedmetadata", () => {
+      console.log("Metadata dimuat.");
+    });
+
+    video.addEventListener("canplaythrough", () => {
       ready = true;
-      loading.textContent = 'Siap. Klik untuk putar dengan suara.';
+      console.log("Video siap diputar.");
     });
 
-    // Jika metadata sudah ada, juga update status (lebih cepat di beberapa server).
-    video.addEventListener('loadedmetadata', () => {
-      if (!ready) loading.textContent = 'Memuat metadata...';
-    });
-
-    video.addEventListener('error', () => {
+    video.addEventListener("error", () => {
       fallback = true;
-      loading.textContent = 'Gagal memuat video. Klik overlay untuk unduh.';
-      label.textContent = 'Unduh video';
+      console.log("Gagal memuat video. Menggunakan mode fallback.");
     });
 
-    // Saat user klik: paksa suara aktif lalu play.
-    overlay.addEventListener('click', async (e) => {
+    overlay.addEventListener("click", async (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // fallback: arahkan ke file jika gagal load
       if (fallback) {
-        window.location.href = 'badapple.mp4';
+        console.log("Fallback aktif. Mengunduh video.");
+        window.location.href = "badapple.mp4";
         return;
       }
 
-      // Jika belum siap, beri umpan balik singkat dan coba tetap play
       if (!ready) {
-        loading.textContent = 'Masih memuat. Mencoba putar...';
+        console.log("Video belum sepenuhnya siap. Mencoba memutar...");
       }
 
-      // Pastikan kita mencoba menjalankan dengan suara aktif.
       try {
-        video.muted = false;          // set unmuted sebelum play
-        video.volume = 1.0;          // volume penuh (ubah bila perlu)
-        await video.play();          // user-initiated play -> biasanya diizinkan
-        overlay.style.display = 'none';
-        loading.classList.add('hidden');
+        video.muted = false;     // paksa suara aktif
+        video.volume = 1.0;
+        await video.play();
+        console.log("Video diputar dengan suara.");
+        overlay.style.display = "none";
       } catch (err) {
-        // Jika browser menolak (jarang saat ada klik user), coba fallback:
+        console.log("Pemutaran dengan suara gagal. Coba mute dulu.");
         try {
-          // coba play muted (agar minimal video muncul), lalu beri instruksi unmute manual.
           video.muted = true;
           await video.play();
-          loading.textContent = 'Pemutaran diblokir untuk suara. Ketuk ikon volume browser untuk aktifkan suara.';
-          label.textContent = 'Buka suara';
-          // biarkan overlay tampil agar user bisa klik lagi untuk arahkan unduh.
+          console.log("Video diputar tetapi tanpa suara. Browser memblokir audio.");
         } catch (err2) {
-          // Jika tetap gagal, tawarkan unduh
-          loading.textContent = 'Tidak dapat memutar video. Mengunduh...';
-          window.location.href = 'badapple.mp4';
+          console.log("Pemutaran gagal total. Mengunduh video.");
+          window.location.href = "badapple.mp4";
         }
       }
-    }, { passive:false });
+    });
 
-    // Keyboard accesibility (Enter / Space)
+    // akses keyboard
     overlay.tabIndex = 0;
-    overlay.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter' || ev.key === ' ') {
+    overlay.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
         overlay.click();
       }
     });
 
-    // Timeout fallback kalau sangat lambat
+    // fallback timeout
     setTimeout(() => {
       if (!ready && !fallback) {
-        loading.textContent = 'Memuat lama. Klik untuk coba unduh.';
-        label.textContent = 'Unduh video';
+        console.log("Memuat terlalu lama. Mengaktifkan fallback.");
         fallback = true;
       }
     }, 12000);
