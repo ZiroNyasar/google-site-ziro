@@ -5,102 +5,248 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rahasia</title>
   <style>
-    html,body { margin:0; padding:0; height:100%; background:#000; overflow:hidden }
-    video {
-      position:fixed; top:0; left:0;
-      width:100vw; height:100vh;
-      object-fit:fill; /* STRETCH */
-      pointer-events:none;
-      background:black;
+    html,body {
+      margin:0;
+      padding:0;
+      height:100%;
+      background:#000;
+      overflow:hidden;
+      font-family:system-ui,Segoe UI,Roboto,Arial;
+      color:#fff;
     }
+
+    /* Video stretch seperti permintaan (fill) */
+    video {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100vw;
+      height:100vh;
+      object-fit:fill;
+      background:black;
+      pointer-events:none;
+    }
+
+    /* Overlay kontroller */
     .overlay {
       position:fixed;
-      inset:0;
+      top:0;
+      left:0;
+      width:100vw;
+      height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:rgba(0,0,0,0.28);
-      z-index:3;
+      z-index:4;
       user-select:none;
-      -webkit-tap-highlight-color:transparent;
+      -webkit-tap-highlight-color: transparent;
+      background:rgba(0,0,0,0.28);
     }
-    .ui {
+
+    .panel {
       display:flex;
       gap:12px;
       align-items:center;
-      padding:12px 18px;
-      background:rgba(255,255,255,0.05);
-      backdrop-filter:blur(5px);
+      padding:12px 16px;
       border-radius:10px;
-      color:white;
-      font-family:system-ui,Segoe UI,Roboto,Arial;
+      background:rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      box-shadow:0 8px 24px rgba(0,0,0,0.6);
     }
-    .loading { font-size:13px; opacity:0.85 }
+
+    .spinner {
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,0.12);
+      border-top-color:rgba(255,255,255,0.95);
+      animation:spin .9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status {
+      font-size:14px;
+      line-height:1;
+      min-width:160px;
+      text-align:left;
+    }
+
     .btn {
       padding:10px 14px;
       border-radius:8px;
-      border:0;
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.06);
       font-weight:600;
-      background:rgba(255,255,255,0.12);
-      color:white;
       cursor:pointer;
+      user-select:none;
     }
-    .btn:disabled { opacity:0.45; cursor:default }
+
+    .btn[aria-disabled="true"] {
+      opacity:0.45;
+      cursor:not-allowed;
+      pointer-events:none;
+    }
+
+    .hidden { display:none; }
   </style>
 </head>
 <body>
-
-  <video id="vA" playsinline loop preload="auto" crossorigin="anonymous">
+  <video id="badapple" playsinline loop preload="auto" crossorigin="anonymous">
     <source src="badapple.mp4" type="video/mp4">
   </video>
 
-  <div class="overlay" id="ovA">
-    <div class="ui">
-      <div class="loading" id="Lx">Memuat...</div>
-      <button class="btn" id="Px" disabled>Putar</button>
+  <div class="overlay" id="overlay" aria-hidden="false">
+    <div class="panel" role="group" aria-label="Kontrol video">
+      <div class="spinner" id="spinner" aria-hidden="true"></div>
+      <div class="status" id="statusText">Memuat video... Mohon tunggu</div>
+      <button class="btn" id="playBtn" aria-pressed="false" aria-disabled="true">Putar</button>
+      <button class="btn" id="muteBtn" aria-pressed="true">Suara: ON</button>
     </div>
   </div>
 
-  <!-- SCRIPT OBFUSCATED -->
   <script>
-    (function(){
-      const encoded =
-"Y29uc3QgXzFhID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3ZBJyk7C"
-+"mNvbnN0IF8yYiA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdPdkEnKTsK"
-+"Y29uc3QgXzNjID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ0x4Jyk7CmNv"
-+"bnN0IF80ZCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdQeCcpOwoKbGV0"
-+"IF81ZSA9IGZhbHNlOwpsZXQgXzZmID0gZmFsc2U7CgovLyB2aWRlbyByZWFk"
-+"eQpfMWEuYWRkRXZlbnRMaXN0ZW5lcignY2FucGxheXRocm91Z2gnLCAoKSA9"
-+"PiB7CiAgXzVlID0gdHJ1ZTsKICBfM2MuY2xhc3NMaXN0LmFkZCgnaGlkZGVu"
-+"Jyk7CiAgXzRkLmRpc2FibGVkID0gZmFsc2U7CiAgY29uc29sZS5sb2coJ1Jl"
-+"YWR5Jyk7Cn0pOwoKXzFhLmFkZEV2ZW50TGlzdGVuZXIoJ2xvYWRlZG1ldGFk"
-+"YXRhJywgKCkgPT4gewogIGNvbnNvbGUubG9nKCdNZXRhZGF0YSByZWFkeScp"
-+"Owp9KTsKCnRfcmVhZHkgPSBzZXRUaW1lb3V0KCgpPT57CiAgIGlmKCFfNWUg"
-+"JiYgIV82Zil7XzNmID0gdHJ1ZTt9Cn0sIDE1MDAwKTsKCgovLyBjbGljayBwbGF5"
-+"X2FjdGlvbgpfMmIuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCBhc3luYyBmdW5j"
-+"aW9uKCl7CiAgbGV0IF9wID0gKCk9Pnt9OwoKICBpZihfNmYpewogICAgY29uc29s"
-+"ZS5sb2coJ0ZhbGxiYWNrIE9uLiBEb3dubG9hZGluZy4uLicpOwogICAgd2luZG93"
-+"LmxvY2F0aW9uLmhyZWYgPSAnYmFkYXBwbGUubXA0JzsKICAgIHJldHVybjsKICB9"
-+"CgogaWYoIV81ZSl7CiAgICBjb25zb2xlLmxvZygnQmVsdW0gc2lhcC4gQXR0ZW1w"
-+"dCBydW4uLi4nKTsKICB9CgogIHRyeSB7CiAgICBfMWEubXV0ZWQgPSBmYWxzZTsK"
-+"ICAgIF8xYS52b2x1bWUgPSAxLjA7CiAgICBhd2FpdCBfMWEucGxheSgpOwogICAg"
-+"Y29uc29sZS5sb2coJ1BsYXkgd2l0aCBzb3VuZCBEb25lIScpOwogICAgXzJiLnN0"
-+"eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgfSBjYXRjaChfKXsKICAgIGNvbnNvbGUu"
-+"bG9nKCdhdWRpby1sb2NrZWQgYnJvd3Nlci4uIEF0dGVtcHQgbXV0ZScpOwogICAg"
-+"dHJ5IHsKICAgICAgXzFhLm11dGVkID0gdHJ1ZTsKICAgICAgYXdhaXQgXzFhLnBs"
-+"YXkoKTsKICAgICAgY29uc29sZS5sb2coJ1BsYXkgYnV0IG11dGVkJyk7CiAgICB9"
-+"IGNhdGNoKF9fKXsKICAgICAgY29uc29sZS5sb2coJ1RvdGFsIGZhaWwuIERvd25s"
-+"b2FkJyk7CiAgICAgIHdpbmRvdy5sb2NhdGlvbi5ocmVmID0gJ2JhZGFwcGxlLm1w"
-+"NCc7CiAgICB9CiAgfQp9KTsKCgovLyBhY2Nlc3NpYmlsaXR5CnRfMyA9IGRvY3Vt"
-+"ZW50LmdldEVsZW1lbnRCeUlkKCdPdkEnKTsKX18zLmFkZEV2ZW50TGlzdGVuZXIo"
-+"J2tleWRvd24nLCAoZXYpPT57CiAgaWYgKGV2LmtleSA9PT0gJ0VudGVyJyB8fCBl"
-+"di5rZXkgPT09ICcgJykgewpldi5wcmV2ZW50RGVmYXVsdCgpOwpfMmIuY2xpY2so"
-+"KTsKICB9Cn0pOwo=";
+    const video = document.getElementById('badapple');
+    const overlay = document.getElementById('overlay');
+    const spinner = document.getElementById('spinner');
+    const statusText = document.getElementById('statusText');
+    const playBtn = document.getElementById('playBtn');
+    const muteBtn = document.getElementById('muteBtn');
 
-      const decoded = atob(encoded);
-      (new Function(decoded))();
-    })();
+    let ready = false;
+    let fallback = false;
+
+    console.log('Inisialisasi player');
+
+    // Saat metadata tersedia
+    video.addEventListener('loadedmetadata', () => {
+      console.log('Metadata dimuat');
+      statusText.textContent = 'Memuat video...';
+    });
+
+    // Saat cukup buffered untuk main tanpa jeda
+    video.addEventListener('canplaythrough', () => {
+      ready = true;
+      console.log('Video siap diputar (canplaythrough).');
+      spinner.classList.add('hidden');
+      statusText.textContent = 'Siap diputar';
+      playBtn.setAttribute('aria-disabled','false');
+      playBtn.removeAttribute('disabled');
+    });
+
+    // Fallback jika sudah mulai bisa tampil (loadeddata)
+    video.addEventListener('loadeddata', () => {
+      if (!ready) {
+        console.log('Data video awal dimuat (loadeddata). Menandai siap parsial.');
+        // Tetap jangan aktifkan play sampai canplaythrough,
+        // tapi ubah status supaya user tahu ada progres.
+        statusText.textContent = 'Memuat sebagian...';
+      }
+    });
+
+    video.addEventListener('error', (e) => {
+      fallback = true;
+      console.log('Gagal memuat video. Error event.', e);
+      spinner.classList.add('hidden');
+      statusText.textContent = 'Gagal memuat. Klik Putar untuk unduh.';
+      playBtn.textContent = 'Unduh';
+      playBtn.setAttribute('aria-disabled','false');
+    });
+
+    // Tombol mute toggle (default suara ON sesuai permintaan)
+    video.muted = false;
+    video.volume = 1.0;
+    muteBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      video.muted = !video.muted;
+      muteBtn.setAttribute('aria-pressed', String(!video.muted));
+      muteBtn.textContent = video.muted ? 'Suara: OFF' : 'Suara: ON';
+      console.log('Toggle suara. muted =', video.muted);
+    });
+
+    // Fungsi pemutaran aman, hanya dipanggil saat interaksi user
+    async function tryPlayWithSound() {
+      if (fallback) {
+        console.log('Mode fallback: mengunduh file.');
+        window.location.href = 'badapple.mp4';
+        return;
+      }
+
+      if (!ready) {
+        console.log('User klik play tapi video belum siap. Menunggu sebentar.');
+        // beri sedikit jeda untuk mencoba lagi
+        statusText.textContent = 'Masih memuat. Mencoba putar...';
+      }
+
+      try {
+        // Pastikan suara aktif sebelum play karena ini dipicu oleh klik user
+        video.muted = false;
+        video.volume = 1.0;
+        await video.play();
+        console.log('Video diputar dengan suara aktif.');
+        overlay.style.display = 'none';
+      } catch (err) {
+        console.log('Play dengan suara gagal:', err);
+        // Coba play muted sebagai fallback minimal
+        try {
+          video.muted = true;
+          await video.play();
+          console.log('Video diputar tanpa suara karena kebijakan browser.');
+          statusText.textContent = 'Video diputar tanpa suara. Aktifkan suara jika perlu.';
+          muteBtn.textContent = 'Suara: OFF';
+          muteBtn.setAttribute('aria-pressed','false');
+          // Jangan sembunyikan overlay agar user bisa melihat status
+        } catch (err2) {
+          console.log('Gagal memutar sama sekali. Mengunduh file.', err2);
+          window.location.href = 'badapple.mp4';
+        }
+      }
+    }
+
+    // Klik tombol play
+    playBtn.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      if (playBtn.getAttribute('aria-disabled') === 'true') {
+        console.log('Tombol play diklik tapi masih disabled.');
+        return;
+      }
+      // Jika tombol Show "Unduh", fallback akan diarahkan di tryPlayWithSound.
+      await tryPlayWithSound();
+    });
+
+    // Klik area overlay juga memicu play untuk kemudahan
+    overlay.addEventListener('click', async (ev) => {
+      // Jika klik terjadi pada panel elemen internal, biarkan event tombol yang menangani.
+      const target = ev.target;
+      if (target === playBtn || target === muteBtn) return;
+      // Jika play belum aktif, lakukan aksi sama seperti tombol play
+      if (playBtn.getAttribute('aria-disabled') === 'false') {
+        await tryPlayWithSound();
+      } else {
+        console.log('Overlay diklik tetapi tombol play masih nonaktif.');
+      }
+    }, { passive:false });
+
+    // Keyboard accessibility
+    playBtn.tabIndex = 0;
+    muteBtn.tabIndex = 0;
+    playBtn.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        playBtn.click();
+      }
+    });
+
+    // Timeout fallback agar user tidak menunggu selamanya
+    setTimeout(() => {
+      if (!ready && !fallback) {
+        fallback = true;
+        console.log('Timeout: memuat terlalu lama. Mengaktifkan fallback.');
+        spinner.classList.add('hidden');
+        statusText.textContent = 'Memuat lama. Klik Putar untuk unduh.';
+        playBtn.textContent = 'Unduh';
+        playBtn.setAttribute('aria-disabled','false');
+      }
+    }, 15000); // 15 detik
   </script>
-
 </body>
 </html>
