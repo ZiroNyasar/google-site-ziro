@@ -5,117 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rahasia</title>
   <style>
-    html, body {
-      margin:0;
-      padding:0;
-      height:100%;
-      background:#000;
-      overflow:hidden;
-    }
+    html,body { margin:0; padding:0; height:100%; background:#000; overflow:hidden }
     video {
-      position:fixed;
-      top:0;
-      left:0;
-      width:100vw;
-      height:100vh;
-      object-fit:fill; /* stretch sesuai permintaan */
+      position:fixed; top:0; left:0;
+      width:100vw; height:100vh;
+      object-fit:fill; /* STRETCH */
       pointer-events:none;
       background:black;
     }
     .overlay {
       position:fixed;
-      top:0;
-      left:0;
-      width:100vw;
-      height:100vh;
+      inset:0;
       display:flex;
       align-items:center;
       justify-content:center;
-      z-index:2;
-      cursor:pointer;
-      background:rgba(0,0,0,0.35);
+      background:rgba(0,0,0,0.28);
+      z-index:3;
       user-select:none;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-tap-highlight-color:transparent;
     }
+    .ui {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:12px 18px;
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(5px);
+      border-radius:10px;
+      color:white;
+      font-family:system-ui,Segoe UI,Roboto,Arial;
+    }
+    .loading { font-size:13px; opacity:0.85 }
+    .btn {
+      padding:10px 14px;
+      border-radius:8px;
+      border:0;
+      font-weight:600;
+      background:rgba(255,255,255,0.12);
+      color:white;
+      cursor:pointer;
+    }
+    .btn:disabled { opacity:0.45; cursor:default }
   </style>
 </head>
 <body>
-  <video id="badapple" playsinline loop preload="auto" crossorigin="anonymous">
+
+  <video id="vA" playsinline loop preload="auto" crossorigin="anonymous">
     <source src="badapple.mp4" type="video/mp4">
   </video>
 
-  <div class="overlay" id="overlay"></div>
+  <div class="overlay" id="ovA">
+    <div class="ui">
+      <div class="loading" id="Lx">Memuat...</div>
+      <button class="btn" id="Px" disabled>Putar</button>
+    </div>
+  </div>
 
+  <!-- SCRIPT OBFUSCATED -->
   <script>
-    const video = document.getElementById("badapple");
-    const overlay = document.getElementById("overlay");
+    (function(){
+      const encoded =
+"Y29uc3QgXzFhID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3ZBJyk7C"
++"mNvbnN0IF8yYiA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdPdkEnKTsK"
++"Y29uc3QgXzNjID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ0x4Jyk7CmNv"
++"bnN0IF80ZCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdQeCcpOwoKbGV0"
++"IF81ZSA9IGZhbHNlOwpsZXQgXzZmID0gZmFsc2U7CgovLyB2aWRlbyByZWFk"
++"eQpfMWEuYWRkRXZlbnRMaXN0ZW5lcignY2FucGxheXRocm91Z2gnLCAoKSA9"
++"PiB7CiAgXzVlID0gdHJ1ZTsKICBfM2MuY2xhc3NMaXN0LmFkZCgnaGlkZGVu"
++"Jyk7CiAgXzRkLmRpc2FibGVkID0gZmFsc2U7CiAgY29uc29sZS5sb2coJ1Jl"
++"YWR5Jyk7Cn0pOwoKXzFhLmFkZEV2ZW50TGlzdGVuZXIoJ2xvYWRlZG1ldGFk"
++"YXRhJywgKCkgPT4gewogIGNvbnNvbGUubG9nKCdNZXRhZGF0YSByZWFkeScp"
++"Owp9KTsKCnRfcmVhZHkgPSBzZXRUaW1lb3V0KCgpPT57CiAgIGlmKCFfNWUg"
++"JiYgIV82Zil7XzNmID0gdHJ1ZTt9Cn0sIDE1MDAwKTsKCgovLyBjbGljayBwbGF5"
++"X2FjdGlvbgpfMmIuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCBhc3luYyBmdW5j"
++"aW9uKCl7CiAgbGV0IF9wID0gKCk9Pnt9OwoKICBpZihfNmYpewogICAgY29uc29s"
++"ZS5sb2coJ0ZhbGxiYWNrIE9uLiBEb3dubG9hZGluZy4uLicpOwogICAgd2luZG93"
++"LmxvY2F0aW9uLmhyZWYgPSAnYmFkYXBwbGUubXA0JzsKICAgIHJldHVybjsKICB9"
++"CgogaWYoIV81ZSl7CiAgICBjb25zb2xlLmxvZygnQmVsdW0gc2lhcC4gQXR0ZW1w"
++"dCBydW4uLi4nKTsKICB9CgogIHRyeSB7CiAgICBfMWEubXV0ZWQgPSBmYWxzZTsK"
++"ICAgIF8xYS52b2x1bWUgPSAxLjA7CiAgICBhd2FpdCBfMWEucGxheSgpOwogICAg"
++"Y29uc29sZS5sb2coJ1BsYXkgd2l0aCBzb3VuZCBEb25lIScpOwogICAgXzJiLnN0"
++"eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgfSBjYXRjaChfKXsKICAgIGNvbnNvbGUu"
++"bG9nKCdhdWRpby1sb2NrZWQgYnJvd3Nlci4uIEF0dGVtcHQgbXV0ZScpOwogICAg"
++"dHJ5IHsKICAgICAgXzFhLm11dGVkID0gdHJ1ZTsKICAgICAgYXdhaXQgXzFhLnBs"
++"YXkoKTsKICAgICAgY29uc29sZS5sb2coJ1BsYXkgYnV0IG11dGVkJyk7CiAgICB9"
++"IGNhdGNoKF9fKXsKICAgICAgY29uc29sZS5sb2coJ1RvdGFsIGZhaWwuIERvd25s"
++"b2FkJyk7CiAgICAgIHdpbmRvdy5sb2NhdGlvbi5ocmVmID0gJ2JhZGFwcGxlLm1w"
++"NCc7CiAgICB9CiAgfQp9KTsKCgovLyBhY2Nlc3NpYmlsaXR5CnRfMyA9IGRvY3Vt"
++"ZW50LmdldEVsZW1lbnRCeUlkKCdPdkEnKTsKX18zLmFkZEV2ZW50TGlzdGVuZXIo"
++"J2tleWRvd24nLCAoZXYpPT57CiAgaWYgKGV2LmtleSA9PT0gJ0VudGVyJyB8fCBl"
++"di5rZXkgPT09ICcgJykgewpldi5wcmV2ZW50RGVmYXVsdCgpOwpfMmIuY2xpY2so"
++"KTsKICB9Cn0pOwo=";
 
-    let ready = false;
-    let fallback = false;
-
-    video.addEventListener("loadedmetadata", () => {
-      console.log("Metadata dimuat.");
-    });
-
-    video.addEventListener("canplaythrough", () => {
-      ready = true;
-      console.log("Video siap diputar.");
-    });
-
-    video.addEventListener("error", () => {
-      fallback = true;
-      console.log("Gagal memuat video. Menggunakan mode fallback.");
-    });
-
-    overlay.addEventListener("click", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (fallback) {
-        console.log("Fallback aktif. Mengunduh video.");
-        window.location.href = "badapple.mp4";
-        return;
-      }
-
-      if (!ready) {
-        console.log("Video belum sepenuhnya siap. Mencoba memutar...");
-      }
-
-      try {
-        video.muted = false;     // paksa suara aktif
-        video.volume = 1.0;
-        await video.play();
-        console.log("Video diputar dengan suara.");
-        overlay.style.display = "none";
-      } catch (err) {
-        console.log("Pemutaran dengan suara gagal. Coba mute dulu.");
-        try {
-          video.muted = true;
-          await video.play();
-          console.log("Video diputar tetapi tanpa suara. Browser memblokir audio.");
-        } catch (err2) {
-          console.log("Pemutaran gagal total. Mengunduh video.");
-          window.location.href = "badapple.mp4";
-        }
-      }
-    });
-
-    // akses keyboard
-    overlay.tabIndex = 0;
-    overlay.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" || ev.key === " ") {
-        ev.preventDefault();
-        overlay.click();
-      }
-    });
-
-    // fallback timeout
-    setTimeout(() => {
-      if (!ready && !fallback) {
-        console.log("Memuat terlalu lama. Mengaktifkan fallback.");
-        fallback = true;
-      }
-    }, 12000);
+      const decoded = atob(encoded);
+      (new Function(decoded))();
+    })();
   </script>
+
 </body>
 </html>
